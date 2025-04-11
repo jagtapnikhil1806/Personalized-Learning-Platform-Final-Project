@@ -4,6 +4,7 @@ import { updateCompletedLectures } from "../../slices/viewCourseSlice"
 // import { setLoading } from "../../slices/profileSlice";
 import { apiConnector } from "../apiConnector"
 import { courseEndpoints } from "../apis"
+import {categories} from "../apis"
 
 const {
   COURSE_DETAILS_API,
@@ -22,9 +23,12 @@ const {
   GET_FULL_COURSE_DETAILS_AUTHENTICATED,
   CREATE_RATING_API,
   LECTURE_COMPLETION_API,
+  
 } = courseEndpoints
 
-
+const{CREATE_CATEGORIES_API,
+  UPDATE_CATEGORIES_API,
+   DELETE_CATEGORIES_API}= categories
 
 // ================ get All Courses ================
 export const getAllCourses = async () => {
@@ -87,6 +91,113 @@ export const fetchCourseCategories = async () => {
   }
   return result
 }
+export const createCourseCategory = async (data) => {
+  let result = null;
+  const toastId = toast.loading("Creating category...");
+
+  try {
+   
+
+    const response = await apiConnector(
+      "POST",
+      CREATE_CATEGORIES_API,
+      data,
+      {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")?.replace(/^"|"$/g, "")}`,
+        // Authorization: `Bearer ${localStorage.getItem("token")}`,
+      }
+    );
+
+    console.log("CREATE_CATEGORIES_API RESPONSE............", response);
+
+    if (!response?.data?.success) {
+      throw new Error("Could Not Create Course Category");
+    }
+
+    // toast.success("Category created successfully");
+    result = response?.data?.data;
+  } catch (error) {
+    console.log("CREATE_CATEGORY_API API ERROR............", error);
+    toast.error(error.message);
+  } finally {
+    toast.dismiss(toastId);
+  }
+
+  return result;
+};
+
+
+
+export const updateCourseCategory = async (data) => {
+  let result = null;
+  const toastId = toast.loading("Updating category...");
+
+  try {
+   
+
+    const response = await apiConnector(
+      "PUT",
+      UPDATE_CATEGORIES_API,
+      data,
+      {
+        "Content-Type": "application/json",
+       
+
+        Authorization: `Bearer ${localStorage.getItem("token")?.replace(/^"|"$/g, "")}`,
+      }
+    );
+
+    console.log("UPDATE_CATEGORIES_API RESPONSE............", response);
+
+    if (!response?.data?.success) {
+      throw new Error("Could Not Update Course Category");
+    }
+
+   
+    result = response?.data?.data;
+  } catch (error) {
+    console.log("UPDATE_CATEGORY_API API ERROR............", error);
+    toast.error(error.message);
+  } finally {
+    toast.dismiss(toastId);
+  }
+
+  return result;
+};
+
+export const deleteCourseCategory = async (categoryId) => {
+  let success = false;
+  const toastId = toast.loading("Deleting category...");
+
+  try {
+    const response = await apiConnector(
+      "DELETE",
+      DELETE_CATEGORIES_API,
+      { categoryId },
+      {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")?.replace(/^"|"$/g, "")}`,
+      }
+    );
+
+    console.log("DELETE_CATEGORIES_API RESPONSE............", response);
+
+    if (!response?.data?.success) {
+      throw new Error("Could Not Delete Course Category");
+    }
+
+   
+    success = true;
+  } catch (error) {
+    console.log("DELETE_CATEGORY_API API ERROR............", error);
+    toast.error(error.message);
+  } finally {
+    toast.dismiss(toastId);
+  }
+
+  return success;
+};
 
 
 // ================ add Course Details ================

@@ -234,7 +234,7 @@ import Instructor from './components/core/Dashboard/Instructor';
 import AdminAnalyticsPage from "./pages/AdminAnalyticPage";
 // import AdminCourses from "./components/core/Admin/AdminCourses";
 // import AdminUsers from "./components/core/Admin/AdminUsers";
-// import AdminCategories from "./components/core/Admin/AdminCategories";
+import AdminCategories from "./pages/AdminCategories";
 
 import Cart from "./components/core/Dashboard/Cart/Cart";
 import EnrolledCourses from "./components/core/Dashboard/EnrolledCourses";
@@ -370,10 +370,10 @@ function App() {
           {/* Route only for Admin */}
           {user?.accountType === ACCOUNT_TYPE.ADMIN && (
             <>
-              <Route path="dashboard/admin" element={<AdminAnalyticsPage/>} />
-              {/* <Route path="dashboard/admin/courses" element={<AdminCourses />} />
-              <Route path="dashboard/admin/users" element={<AdminUsers />} />
-              <Route path="dashboard/admin/categories" element={<AdminCategories />} /> */}
+              {/* <Route path="dashboard/admin" element={} /> */}
+              <Route path="dashboard/admin/analytics" element={<AdminAnalyticsPage/>} />
+              {/* <Route path="dashboard/admin/users" element={<AdminUsers />} /> */}
+              <Route path="dashboard/admin/categories" element={<AdminCategories />} />
             </>
           )}
         </Route>

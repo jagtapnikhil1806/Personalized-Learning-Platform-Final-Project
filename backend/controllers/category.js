@@ -148,3 +148,96 @@ exports.getCategoryPageDetails = async (req, res) => {
         })
     }
 }
+
+// ================ Update Category ================
+exports.updateCategory = async (req, res) => {
+    try {
+        const { categoryId, name, description } = req.body;
+
+        // Validation
+        if (!categoryId || !name || !description) {
+            return res.status(400).json({
+                success: false,
+                message: 'Category ID, name and description are required'
+            });
+        }
+
+        // Check if category exists
+        const existingCategory = await Category.findById(categoryId);
+        if (!existingCategory) {
+            return res.status(404).json({
+                success: false,
+                message: 'Category not found'
+            });
+        }
+
+        // Update category
+        const updatedCategory = await Category.findByIdAndUpdate(
+            categoryId,
+            { name, description },
+            { new: true } // Return the updated document
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Category updated successfully',
+            data: updatedCategory
+        });
+    } catch (error) {
+        console.log('Error while updating category');
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error while updating category',
+            error: error.message
+        });
+    }
+}
+
+// ================ Delete Category ================
+exports.deleteCategory = async (req, res) => {
+    try {
+        const { categoryId } = req.body;
+
+        // Validation
+        if (!categoryId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Category ID is required'
+            });
+        }
+
+        // Check if category exists
+        const existingCategory = await Category.findById(categoryId);
+        if (!existingCategory) {
+            return res.status(404).json({
+                success: false,
+                message: 'Category not found'
+            });
+        }
+
+        // Check if category has any courses
+        if (existingCategory.courses.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot delete category with associated courses. Please remove courses first.'
+            });
+        }
+
+        // Delete category
+        await Category.findByIdAndDelete(categoryId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Category deleted successfully'
+        });
+    } catch (error) {
+        console.log('Error while deleting category');
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error while deleting category',
+            error: error.message
+        });
+    }
+}

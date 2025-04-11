@@ -325,8 +325,8 @@ const Navbar = () => {
                     {/* Admin Dashboard Link - Only visible to Admin users */}
                     {user?.accountType === ACCOUNT_TYPE.ADMIN && (
                         <li>
-                            <Link to="/dashboard/admin">
-                                <p className={`${matchRoute("/dashboard/admin") ? "bg-yellow-25 text-black" : "text-richblack-25"} rounded-xl p-1 px-3`}>
+                            <Link to="/dashboard/admin/analytics">
+                                <p className={`${matchRoute("/dashboard/admin/analytics") ? "bg-yellow-25 text-black" : "text-richblack-25"} rounded-xl p-1 px-3`}>
                                     Admin Dashboard
                                 </p>
                             </Link>
