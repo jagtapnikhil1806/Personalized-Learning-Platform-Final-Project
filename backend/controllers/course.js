@@ -111,7 +111,7 @@ exports.getAllCourses = async (req, res) => {
         const allCourses = await Course.find({},
             {
                 courseName: true, courseDescription: true, price: true, thumbnail: true, instructor: true,
-                ratingAndReviews: true, studentsEnrolled: true, category:true,
+                ratingAndReviews: true, studentsEnrolled: true, category:true,tag:true
             })
             .populate({
                 path: 'instructor',

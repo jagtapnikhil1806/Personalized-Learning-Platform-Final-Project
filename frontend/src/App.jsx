@@ -236,6 +236,7 @@ import AdminAnalyticsPage from "./pages/AdminAnalyticPage";
 // import AdminUsers from "./components/core/Admin/AdminUsers";
 import AdminCategories from "./pages/AdminCategories";
 
+import Courses from "./pages/Courses";
 import Cart from "./components/core/Dashboard/Cart/Cart";
 import EnrolledCourses from "./components/core/Dashboard/EnrolledCourses";
 import AddCourse from "./components/core/Dashboard/AddCourse/AddCourse";
@@ -297,6 +298,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/catalog/:catalogName" element={<Catalog />} />
         <Route path="courses/:courseId" element={<CourseDetails />} />
+        <Route path="/courses" element={<Courses/>} />
+        
 
         {/* Open Route - for Only Non Logged in User */}
         <Route
