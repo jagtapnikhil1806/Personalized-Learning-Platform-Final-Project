@@ -236,6 +236,8 @@ import AdminAnalyticsPage from "./pages/AdminAnalyticPage";
 // import AdminUsers from "./components/core/Admin/AdminUsers";
 import AdminCategories from "./pages/AdminCategories";
 
+import StudentAnalyticsPage from "./pages/StudentAnalyticsPage";
+
 import Courses from "./pages/Courses";
 import Cart from "./components/core/Dashboard/Cart/Cart";
 import EnrolledCourses from "./components/core/Dashboard/EnrolledCourses";
@@ -357,6 +359,7 @@ function App() {
             <>
               <Route path="dashboard/cart" element={<Cart />} />
               <Route path="dashboard/enrolled-courses" element={<EnrolledCourses />} />
+              <Route path="dashboard/analytics" element={<StudentAnalyticsPage />} />
             </>
           )}
 

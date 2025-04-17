@@ -86,17 +86,23 @@ export const sidebarLinks = [
     path: "/dashboard/purchase-history",
     type: ACCOUNT_TYPE.STUDENT,
     icon: "VscHistory",
+  },{
+    id: 7,
+    name: "Student Analytics",
+    path: "/dashboard/analytics",
+    type: ACCOUNT_TYPE.STUDENT,
+    icon: "VscGraph",
   },
   // Admin specific links
   {
-    id: 7,
+    id: 8,
     name: "Admin Analytics",
     path: "/dashboard/admin/analytics",
     type: ACCOUNT_TYPE.ADMIN,
     icon: "VscGraph",
   },
   {
-    id: 8,
+    id: 9,
     name: "Manage Categories",
     path: "/dashboard/admin/categories",
     type: ACCOUNT_TYPE.ADMIN,

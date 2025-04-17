@@ -7,6 +7,7 @@ export const endpoints = {
   LOGIN_API: BASE_URL + "/auth/login",
   RESETPASSTOKEN_API: BASE_URL + "/auth/reset-password-token",
   RESETPASSWORD_API: BASE_URL + "/auth/reset-password",
+  GET_ALL_USERS_API: BASE_URL +"/auth/get-all-users"
 }
 
 // PROFILE ENDPOINTS
@@ -41,6 +42,8 @@ export const courseEndpoints = {
   GET_FULL_COURSE_DETAILS_AUTHENTICATED: BASE_URL + "/course/getFullCourseDetails",
   LECTURE_COMPLETION_API: BASE_URL + "/course/updateCourseProgress",
   CREATE_RATING_API: BASE_URL + "/course/createRating",
+  GET_ENROLLMENT_STATS_API:BASE_URL +"/course/enrollment-stats",
+ 
 }
 
 // RATINGS AND REVIEWS

@@ -12,6 +12,8 @@ const {
     editCourse,
     deleteCourse,
     getInstructorCourses,
+    getEnrollmentStats,
+   
 
 } = require('../controllers/course')
 
@@ -58,6 +60,9 @@ const { auth, isAdmin, isInstructor, isStudent } = require('../middleware/auth')
 // ********************************************************************************************************
 //                                      Course routes
 // ********************************************************************************************************
+
+
+router.get('/enrollment-stats', auth, isAdmin, getEnrollmentStats)
 // Courses can Only be Created by Instructors
 
 router.post('/createCourse', auth, isInstructor, createCourse);
@@ -108,6 +113,9 @@ router.put('/updateCategory', auth, isAdmin, updateCategory);
 router.delete('/deleteCategory', auth, isAdmin, deleteCategory);
 router.get('/showAllCategories', showAllCategories);
 router.get("/getCategoryPageDetails", getCategoryPageDetails)
+
+
+
 
 
 

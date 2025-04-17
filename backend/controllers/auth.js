@@ -422,3 +422,51 @@ exports.changePassword = async (req, res) => {
         })
     }
 }
+
+// controllers/user/getAllUsers.js
+
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Fetch all users with their profiles
+    const users = await User.find({})
+      .select('-password -refreshToken') // Exclude sensitive fields
+      .populate({
+        path: 'additionalDetails',
+        select: 'contactNumber about dateOfBirth gender' // Only include these profile fields
+      })
+      .lean() // Convert to plain JavaScript object
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No users found"
+      })
+    }
+
+    // Format the response data
+    const formattedUsers = users.map(user => ({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      accountType: user.accountType,
+      image: user.image,
+      createdAt: user.createdAt,
+      additionalDetails: user.additionalDetails || {}
+    }))
+
+    return res.status(200).json({
+      success: true,
+      data: formattedUsers
+    })
+
+  } catch (error) {
+    console.error("Error fetching users:", error)
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch users",
+      error: error.message
+    })
+  }
+}

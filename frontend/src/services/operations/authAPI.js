@@ -12,6 +12,7 @@ const {
   LOGIN_API,
   RESETPASSTOKEN_API,
   RESETPASSWORD_API,
+  GET_ALL_USERS_API
 } = endpoints
 
 // ================ send Otp ================
@@ -198,4 +199,25 @@ export function logout(navigate) {
     toast.success("Logged Out")
     navigate("/")
   }
+}
+export const fetchAllUsers = async (token) => {
+  let result = []
+  try {
+    const response = await apiConnector(
+      "GET",
+      GET_ALL_USERS_API,
+      null,
+      {
+        Authorization: `Bearer ${localStorage.getItem("token")?.replace(/^"|"$/g, "")}`,
+      }
+    )
+    console.log("GET ALL USERS API RESPONSE", response)
+    if (!response?.data?.success) {
+      throw new Error("Could Not Fetch Users")
+    }
+    result = response?.data?.data
+  } catch (error) {
+    console.log("GET ALL USERS API ERROR............", error)
+  }
+  return result
 }

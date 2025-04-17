@@ -23,6 +23,8 @@ const {
   GET_FULL_COURSE_DETAILS_AUTHENTICATED,
   CREATE_RATING_API,
   LECTURE_COMPLETION_API,
+  GET_ENROLLMENT_STATS_API,
+ 
   
 } = courseEndpoints
 
@@ -533,3 +535,27 @@ export const createRating = async (data, token) => {
   toast.dismiss(toastId)
   return success
 }
+
+export const fetchEnrollmentStats = async (token) => {
+  let result = null
+  try {
+    const response = await apiConnector(
+      "GET",
+      GET_ENROLLMENT_STATS_API,
+      null,
+      {
+        Authorization: `Bearer ${localStorage.getItem("token")?.replace(/^"|"$/g, "")}`,
+      }
+    )
+    console.log("ENROLLMENT STATS API RESPONSE", response)
+    if (!response?.data?.success) {
+      throw new Error("Could Not Fetch Enrollment Stats")
+    }
+    result = response?.data?.data
+  } catch (error) {
+    console.log("ENROLLMENT STATS API ERROR............", error)
+  }
+  return result
+}
+
+

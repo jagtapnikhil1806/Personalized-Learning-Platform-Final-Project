@@ -621,7 +621,157 @@ exports.deleteCourse = async (req, res) => {
         })
     }
 }
+// controllers/analytics/getEnrollmentStats.js
 
 
+exports.getEnrollmentStats = async (req, res) => {
+  try {
+    // Get current date and calculate date ranges
+    const currentDate = new Date()
+    const currentYear = currentDate.getFullYear()
+    
+    // Calculate monthly enrollments for the current year
+    const monthlyEnrollments = await Course.aggregate([
+      {
+        $unwind: "$studentsEnrolled" // Split by each enrollment
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "studentsEnrolled",
+          foreignField: "_id",
+          as: "student"
+        }
+      },
+      {
+        $unwind: "$student"
+      },
+      {
+        $project: {
+          month: { $month: "$student.createdAt" },
+          year: { $year: "$student.createdAt" }
+        }
+      },
+      {
+        $match: {
+          year: currentYear
+        }
+      },
+      {
+        $group: {
+          _id: "$month",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { "_id": 1 }
+      },
+      {
+        $project: {
+          month: "$_id",
+          count: 1,
+          _id: 0
+        }
+      }
+    ])
 
+    // Fill in missing months with zero counts
+    const allMonths = Array.from({ length: 12 }, (_, i) => i + 1)
+    const completeMonthlyData = allMonths.map(month => {
+      const found = monthlyEnrollments.find(m => m.month === month)
+      return {
+        month: month,
+        count: found ? found.count : 0
+      }
+    })
+
+    // Calculate growth percentage compared to previous month
+    let monthlyGrowth = 0
+    if (completeMonthlyData.length > 1) {
+      const currentMonth = currentDate.getMonth() + 1 // 1-12
+      const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1
+      
+      const currentData = completeMonthlyData.find(m => m.month === currentMonth)?.count || 0
+      const prevData = completeMonthlyData.find(m => m.month === prevMonth)?.count || 0
+      
+      monthlyGrowth = prevData > 0 
+        ? Math.round(((currentData - prevData) / prevData) * 100) 
+        : currentData > 0 ? 100 : 0
+    }
+
+    // Calculate total revenue and revenue growth
+    const revenueData = await Course.aggregate([
+      {
+        $project: {
+          revenue: {
+            $multiply: [
+              "$price",
+              { $size: { $ifNull: ["$studentsEnrolled", []] } }
+            ]
+          },
+          createdAt: 1
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: "$revenue" },
+          currentMonthRevenue: {
+            $sum: {
+              $cond: [
+                { $eq: [{ $month: "$createdAt" }, currentDate.getMonth() + 1] },
+                "$revenue",
+                0
+              ]
+            }
+          },
+          previousMonthRevenue: {
+            $sum: {
+              $cond: [
+                { $eq: [{ $month: "$createdAt" }, currentDate.getMonth()] },
+                "$revenue",
+                0
+              ]
+            }
+          }
+        }
+      }
+    ])
+
+    const totalRevenue = revenueData[0]?.totalRevenue || 0
+    const currentMonthRevenue = revenueData[0]?.currentMonthRevenue || 0
+    const previousMonthRevenue = revenueData[0]?.previousMonthRevenue || 0
+
+    const revenueGrowth = previousMonthRevenue > 0
+      ? Math.round(((currentMonthRevenue - previousMonthRevenue) / previousMonthRevenue) * 100)
+      : currentMonthRevenue > 0 ? 100 : 0
+
+    // Prepare response
+    const response = {
+      monthlyEnrollments: completeMonthlyData.map(item => ({
+        month: new Date(currentYear, item.month - 1, 1).toLocaleString('default', { month: 'short' }),
+        count: item.count
+      })),
+      monthlyGrowth,
+      totalEnrollments: completeMonthlyData.reduce((sum, item) => sum + item.count, 0),
+      totalRevenue,
+      revenueGrowth
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: response
+    })
+
+  } catch (error) {
+    console.error("Error fetching enrollment stats:", error)
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch enrollment statistics",
+      error: error.message
+    })
+  }
+}
+
+// controllers/student/getStudentProgress.js
 
