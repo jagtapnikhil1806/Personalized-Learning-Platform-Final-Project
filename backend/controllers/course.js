@@ -106,37 +106,145 @@ exports.createCourse = async (req, res) => {
 
 
 // ================ show all courses ================
+// exports.getAllCourses = async (req, res) => {
+//     try {
+//         const allCourses = await Course.find({},
+//             {
+//                 courseName: true, courseDescription: true, price: true, thumbnail: true, instructor: true,
+//                 ratingAndReviews: true, studentsEnrolled: true, category:true,tag:true, status: true,
+//             })
+//             .populate({
+//                 path: 'instructor',
+//                 select: 'firstName lastName email image'
+//             })
+//             .exec();
+
+//         return res.status(200).json({
+//             success: true,
+//             data: allCourses,
+//             message: 'Data for all courses fetched successfully'
+//         });
+//     }
+
+//     catch (error) {
+//         console.log('Error while fetching data of all courses');
+//         console.log(error);
+//         res.status(500).json({
+//             success: false,
+//             error: error.message,
+//             message: 'Error while fetching data of all courses'
+//         })
+//     }
+// }
+// exports.getAllCourses = async (req, res) => {
+//     try {
+//         const allCourses = await Course.find(
+//             { status: 'Published' },  // Only find courses with status 'published'
+//             {
+//                 courseName: true, 
+//                 courseDescription: true, 
+//                 price: true, 
+//                 thumbnail: true, 
+//                 instructor: true,
+//                 ratingAndReviews: true, 
+//                 studentsEnrolled: true, 
+//                 category: true,
+//                 tag: true, 
+//                 status: true,
+//                 duration: true  // Added duration as it's used in the frontend
+//             })
+//             .populate({
+//                 path: 'instructor',
+//                 select: 'firstName lastName email image'
+//             })
+//             .exec();
+
+//         return res.status(200).json({
+//             success: true,
+//             data: allCourses,
+//             message: 'Data for all published courses fetched successfully'
+//         });
+//     }
+//     catch (error) {
+//         console.log('Error while fetching data of all courses');
+//         console.log(error);
+//         res.status(500).json({
+//             success: false,
+//             error: error.message,
+//             message: 'Error while fetching data of all courses'
+//         })
+//     }
+// }
 exports.getAllCourses = async (req, res) => {
     try {
-        const allCourses = await Course.find({},
+        const allCourses = await Course.find(
+            { status: 'Published' },
             {
-                courseName: true, courseDescription: true, price: true, thumbnail: true, instructor: true,
-                ratingAndReviews: true, studentsEnrolled: true, category:true,tag:true
+                courseName: true, 
+                courseDescription: true, 
+                price: true, 
+                thumbnail: true, 
+                instructor: true,
+                ratingAndReviews: true, 
+                studentsEnrolled: true, 
+                category: true,
+                tag: true, 
+                status: true,
+                courseContent: true  // Include courseContent to calculate duration
             })
             .populate({
                 path: 'instructor',
                 select: 'firstName lastName email image'
             })
+            .populate({
+                path: 'courseContent',
+                populate: {
+                    path: 'subSection'
+                }
+            })
+            .lean()  // Convert to plain JavaScript objects
             .exec();
+
+        // Calculate duration for each course (similar to getEnrolledCourses)
+        const coursesWithDuration = allCourses.map(course => {
+            let totalDurationInSeconds = 0;
+            if (course.courseContent) {
+                course.courseContent.forEach(section => {
+                    if (section.subSection) {
+                        totalDurationInSeconds += section.subSection.reduce(
+                            (acc, curr) => acc + parseInt(curr.timeDuration || 0), 0
+                        );
+                    }
+                });
+            }
+            
+            // Convert to duration string (similar to getEnrolledCourses)
+            const totalDuration = convertSecondsToDuration(totalDurationInSeconds);
+            
+            return {
+                ...course,
+                totalDuration,  // Formatted duration string
+                duration: Math.ceil(totalDurationInSeconds / 60)  // Duration in hours (rounded up)
+            };
+        });
 
         return res.status(200).json({
             success: true,
-            data: allCourses,
-            message: 'Data for all courses fetched successfully'
+            data: coursesWithDuration,
+            message: 'Data for all published courses fetched successfully'
         });
     }
-
     catch (error) {
-        console.log('Error while fetching data of all courses');
-        console.log(error);
+        console.error('Error while fetching data of all courses', error);
         res.status(500).json({
             success: false,
             error: error.message,
             message: 'Error while fetching data of all courses'
-        })
+        });
     }
-}
+};
 
+// Helper function (same as used in getEnrolledCourses)
 
 
 // ================ Get Course Details ================
@@ -370,32 +478,88 @@ exports.editCourse = async (req, res) => {
 
 
 // ================ Get a list of Course for a given Instructor ================
+// exports.getInstructorCourses = async (req, res) => {
+//     try {
+//         // Get the instructor ID from the authenticated user or request body
+//         const instructorId = req.user.id
+
+//         // Find all courses belonging to the instructor
+//         const instructorCourses = await Course.find({ instructor: instructorId, }).sort({ createdAt: -1 })
+
+
+//         // Return the instructor's courses
+//         res.status(200).json({
+//             success: true,
+//             data: instructorCourses,
+//             // totalDurationInSeconds:totalDurationInSeconds,
+//             message: 'Courses made by Instructor fetched successfully'
+//         })
+//     } catch (error) {
+//         console.error(error)
+//         res.status(500).json({
+//             success: false,
+//             message: "Failed to retrieve instructor courses",
+//             error: error.message,
+//         })
+//     }
+// }
 exports.getInstructorCourses = async (req, res) => {
     try {
-        // Get the instructor ID from the authenticated user or request body
-        const instructorId = req.user.id
+        const instructorId = req.user.id;
 
-        // Find all courses belonging to the instructor
-        const instructorCourses = await Course.find({ instructor: instructorId, }).sort({ createdAt: -1 })
+        // Find all courses belonging to the instructor with necessary population
+        const instructorCourses = await Course.find({ 
+            instructor: instructorId 
+        })
+        .populate({
+            path: 'courseContent',
+            populate: {
+                path: 'subSection'
+            }
+        })
+        .sort({ createdAt: -1 })
+        .lean()
+        .exec();
 
+        // Calculate duration for each course
+        const coursesWithDuration = instructorCourses.map(course => {
+            let totalDurationInSeconds = 0;
+            if (course.courseContent) {
+                course.courseContent.forEach(section => {
+                    if (section.subSection) {
+                        totalDurationInSeconds += section.subSection.reduce(
+                            (acc, curr) => acc + parseInt(curr.timeDuration || 0), 0
+                        );
+                    }
+                });
+            }
+            
+            // Convert to duration string
+            const totalDuration = convertSecondsToDuration(totalDurationInSeconds);
+            
+            return {
+                ...course,
+                totalDuration,  // Formatted duration string (e.g., "2h 30m")
+                duration: Math.ceil(totalDurationInSeconds / 60)  // Duration in hours (rounded up)
+            };
+        });
 
-        // Return the instructor's courses
         res.status(200).json({
             success: true,
-            data: instructorCourses,
-            // totalDurationInSeconds:totalDurationInSeconds,
+            data: coursesWithDuration,
             message: 'Courses made by Instructor fetched successfully'
-        })
+        });
     } catch (error) {
-        console.error(error)
+        console.error(error);
         res.status(500).json({
             success: false,
             message: "Failed to retrieve instructor courses",
             error: error.message,
-        })
+        });
     }
-}
+};
 
+// Same helper function used in other controllers
 
 
 // ================ Delete the Course ================

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import HFBot from '../components/Chatbot/HFBot';
+import GeminiChatbot from "../components/GeminiChatbot";
 import { Link } from "react-router-dom"
 import { useDispatch } from 'react-redux';
 
@@ -18,7 +18,7 @@ import { getCatalogPageData } from '../services/operations/pageAndComponentData'
 
 import { MdOutlineRateReview } from 'react-icons/md'
 import { FaArrowRight } from "react-icons/fa"
-
+import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion'
 import { fadeIn, } from './../components/common/motionFrameVarients';
 
@@ -57,7 +57,7 @@ const randomImges = [
 const Home = () => {
 
     // get background random images
-    const currentTopic = "Algebra";
+    const { token } = useSelector((state) => state.auth);
     const [backgroundImg, setBackgroundImg] = useState(null);
 
     useEffect(() => {
@@ -297,7 +297,7 @@ const Home = () => {
                     <ReviewSlider />
                     
                 </div>
-                <HFBot />
+                <GeminiChatbot isLoggedIn={!!token} />
                 {/*Footer */}
                 <Footer />
             </div >

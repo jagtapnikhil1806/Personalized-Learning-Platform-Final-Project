@@ -84,9 +84,11 @@ export default function EnrolledCourses() {
           {/* Course Names */}
           {
             enrolledCourses?.map((course, i, arr) => (
+              
               <div
                 className={`flex flex-col sm:flex-row sm:items-center border border-richblack-700 ${i === arr.length - 1 ? "rounded-b-2xl" : "rounded-none"}`}
                 key={i}
+                
               >
                 <div
                   className="flex sm:w-[45%] cursor-pointer items-center gap-4 px-5 py-3"

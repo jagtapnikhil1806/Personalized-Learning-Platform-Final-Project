@@ -55,6 +55,10 @@ const courseSchema = new mongoose.Schema({
         type: String,
         enum: ['Draft', 'Published']
     },
+    // duration: {
+    //     type: Number,
+    //     description: "Course duration in hours"
+    //   },
     createdAt: {
         type: Date,
     }
@@ -66,3 +70,18 @@ const courseSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Course', courseSchema);
+
+// In your Course model
+// courseSchema.virtual('duration').get(function() {
+//     if (!this.courseContent) return 0;
+//     let minutes = 0;
+//     this.courseContent.forEach(section => {
+//         section.subSection?.forEach(subSection => {
+//             minutes += subSection.timeDuration || 0;
+//         });
+//     });
+//     return Math.ceil(minutes / 60); // Convert to hours
+// });
+
+// // Enable virtuals in toJSON output
+// courseSchema.set('toJSON', { virtuals: true });

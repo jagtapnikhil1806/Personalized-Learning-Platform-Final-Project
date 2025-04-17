@@ -16,7 +16,7 @@ const Courses = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [enrolledCourses, setEnrolledCourses] = useState([]);
-  const { token, user } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const Courses = () => {
     };
 
     fetchData();
-  }, [token, user]);
+  }, [token]);
 
   // Helper function to get category name
   const getCategoryName = (course) => {
@@ -156,7 +156,7 @@ const Courses = () => {
       </div>
 
       {/* Recommended Section */}
-      {showRecommended && (
+      {/* {showRecommended && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h2 className="text-2xl font-bold mb-4">
             {enrolledCourses.length > 0 
@@ -208,8 +208,73 @@ const Courses = () => {
             ))}
           </div>
         </div>
-      )}
+      )} */}
+     {showRecommended && (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <h2 className="text-2xl font-bold mb-4">
+      {enrolledCourses.length > 0 
+        ? 'Recommended for you' 
+        : 'Start learning with these beginner courses'}
+    </h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {recommendedCourses.map((course) => (
+        <div
+          key={course._id}
+          className="bg-richblack-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer relative"
+          onClick={() => navigate(`/courses/${course._id}`)}
+        >
+          {/* Recommended Tag with Gradient Background */}
+          <div className="absolute top-3 right-3 z-10">
+            <span 
+              className="text-white text-xs font-medium px-2 py-1 rounded-full"
+              style={{
+                background: "linear-gradient(to right, #3F5EFB, #FC466B)",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+              }}
+            >
+              Recommended
+            </span>
+          </div>
 
+          <div className="h-40 bg-richblack-700 overflow-hidden">
+            {course.thumbnail ? (
+              <img
+                src={course.thumbnail}
+                alt={course.courseName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-richblack-600 flex items-center justify-center">
+                <span className="text-richblack-200">No thumbnail</span>
+              </div>
+            )}
+          </div>
+          <div className="p-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-lg font-bold text-richblack-5 line-clamp-1">
+                {course.courseName}
+              </h3>
+              <span className="bg-richblack-600 text-richblack-5 text-xs px-2 py-1 rounded-full">
+                {getCategoryName(course)}
+              </span>
+            </div>
+            <p className="text-richblack-200 text-xs mb-2 line-clamp-2">
+              {course.courseDescription}
+            </p>
+            <div className="flex justify-between items-center">
+              <span className="text-yellow-50 text-sm font-medium">
+                {course.price === 0 ? 'Free' : `₹${course.price}`}
+              </span>
+              <span className="text-richblack-300 text-xs">
+                {course.totalDuration}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
       {/* Filter and Search Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -329,7 +394,7 @@ const Courses = () => {
                         {course.price === 0 ? 'Free' : `₹${course.price}`}
                       </span>
                       <span className="text-richblack-300 text-sm">
-                        {course.duration} hours
+                        {course.totalDuration} 
                       </span>
                     </div>
                     {isEnrolled && (
