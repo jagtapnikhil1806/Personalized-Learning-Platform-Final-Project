@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(
     cors({
         // origin: 'http://localhost:5173', // frontend link
-        origin: "https://personalized-learning-platform-zeta.vercel.app",
+        origin: "https://dynamic-course-recommendation-platf.vercel.app",
         
         credentials: true
     })
