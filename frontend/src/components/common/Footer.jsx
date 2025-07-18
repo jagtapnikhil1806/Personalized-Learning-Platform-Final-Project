@@ -181,7 +181,7 @@ const Footer = () => {
                 Nikhil Jagtap & Team 
               </Link>
             </div>
-            <span> © 2024 EduGenic</span>
+            <span> © 2025 EduGenic</span>
           </div>
 
           <div className="flex items-center">
