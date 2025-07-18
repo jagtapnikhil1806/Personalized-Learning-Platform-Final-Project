@@ -20,7 +20,10 @@ const hfRoutes = require('./routes/hfRoutes');
 
 
 
-
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.originalUrl}`);
+  next();
+});
 // middleware 
 app.use(express.json()); // to parse json body
 app.use(cookieParser());
